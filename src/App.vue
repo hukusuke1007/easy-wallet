@@ -4,13 +4,7 @@
       <span>{{ title }} </span>
     </header>
     <main>
-      <img src="./assets/logo.png" :alt="title">
-      <h1>{{ message }}</h1>
-      <!-- router-viewを使ってHello.vueを表示 -->
-      <router-view message="router-viewよりこんにちは"></router-view>
-
-      <!-- componentを使ってHello.vueを表示 -->
-      <Hello message="componentよりこんにちは"></Hello>
+      <Wallet/>
     </main>
   </div>
 </template>
@@ -18,15 +12,15 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-// Helloをimportする.
-import Hello from './components/Hello.vue'
+// Walletをimportする.
+import Wallet from './components/Wallet.vue'
 
 // コンポーネントの設定
 @Component({
   name: 'app',
   // Helloをcomponentとして定義する.
   components: {
-    Hello
+    Wallet
   }
 })
 
@@ -34,7 +28,7 @@ import Hello from './components/Hello.vue'
 export default class App extends Vue {
   
   // 変数( privateは書かなくても良い )
-  private title = 'My PWA page'
+  private title = 'My NEM wallet'
   private message = ''
 
   // コンストラクタのようなもの。開くと初めに呼ばれる

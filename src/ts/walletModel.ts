@@ -1,13 +1,30 @@
 import localForage from 'localforage'
+import nemWrapper from './nemWrapper'
 
 export default class walletModel {
-    balance: string = ''
+    balance: number = 0
     address: string = ''
-    privateKey: string = ''
     publicKey: string = ''
+    privateKey: string = ''
 
+    nem = new nemWrapper()
     constructor() {
         this.load()
+        .then((result) => {
+            console.log(result)
+            if (result === null) {
+                this.nem.createAccount()
+                .then((wallet) => {
+                    this.address = wallet.address
+                    this.privateKey = wallet.privateKey
+                    this.save()
+                }).catch((error) => {
+                    console.error(error)
+                })
+            }
+        }).catch((error) => {
+            console.error(error)
+        })
     }
 
     async save() {
@@ -19,9 +36,11 @@ export default class walletModel {
     async load() {
         let key = 'wallet'
         let result:any = await localForage.getItem(key)
-        this.address = result.address
-        this.privateKey = result.privateKey
-        this.publicKey = result.publicKey
+        if (result !== null) {
+            this.address = result.address
+            this.privateKey = result.privateKey
+            this.publicKey = result.publicKey
+        }
         return result
     }
 

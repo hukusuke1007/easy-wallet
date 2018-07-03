@@ -24,15 +24,22 @@ export default class nemWrapper {
         }
     }
 
-    createAccount(): any {
+    async createAccount() {
         let walletName = "wallet"
         let password = "wallet"
-        let result = nem.model.wallet.createPRNG(walletName, password, this.net)
+        let wallet = nem.model.wallet.createPRNG(walletName, password, this.net)
+        let common = nem.model.objects.create("common")(password, "")
+        let account = wallet.accounts[0]
+        nem.crypto.helpers.passwordToPrivatekey(common, account, account.algo)
+        let result = {
+            address: account.address,
+            privateKey: common.privateKey
+        }
         return result
     }
 
-    async getAccount(publicKey: string) {
-        let result = await nem.com.requests.account.data(this.endpoint, publicKey)
+    async getAccount(address: string) {
+        let result = await nem.com.requests.account.data(this.endpoint, address)
         return result
     }
 
