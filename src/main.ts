@@ -7,6 +7,8 @@ import 'vuetify/dist/vuetify.css'
 // 追加
 import Vuetify from 'vuetify'
 import colors from 'vuetify/es5/util/colors'
+import 'vue2-toast/lib/toast.css'
+import Toast from 'vue2-toast'
 import VueQriously from 'vue-qriously'
 import VueQrcodeReader from 'vue-qrcode-reader'
 
@@ -22,6 +24,12 @@ Vue.use(Vuetify, {
   options: {
     themeVariations: ['original', 'secondary']
   }
+})
+Vue.use(Toast, {
+  defaultType: 'bottom',
+  duration: 3000,
+  wordWrap: true,
+  width: '280px'
 })
 Vue.use(VueQriously)
 Vue.use(VueQrcodeReader)

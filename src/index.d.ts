@@ -6,6 +6,7 @@ declare module "*.vue" {
 declare module "nem-sdk"
 declare module "encoding-japanese"
 declare module "vuetify"
+declare module "vue2-toast"
 declare module "vuetify/es5/util/colors"
 declare module "vue-qriously"
 declare module "vue-qrcode-reader"
