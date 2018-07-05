@@ -4,7 +4,7 @@
       <span>{{ title }} </span>
     </header>
     <main>
-      <Wallet/>
+      <!-- <Wallet/> -->
     </main>
   </v-app>
 </template>
