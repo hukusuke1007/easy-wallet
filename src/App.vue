@@ -1,12 +1,12 @@
 <template>
-  <div id="app">
+  <v-app>
     <header>
       <span>{{ title }} </span>
     </header>
     <main>
       <Wallet/>
     </main>
-  </div>
+  </v-app>
 </template>
 
 <script lang="ts">

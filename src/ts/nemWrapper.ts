@@ -8,15 +8,16 @@ export default class nemWrapper {
     net: string = ''
 
     constructor () {
+        // NIS設定.
         this.host = 'https://aqualife2.supernode.me'
         this.port = '7891'
         this.net = nem.model.network.data.mainnet.id
         this.endpoint = nem.model.objects.create("endpoint")(this.host, this.port)    
     }
 
+    // NISの状態確認.
     async isNIS() {
-        let endpoint = nem.model.objects.create("endpoint")(this.host, this.port)
-        let result = await nem.com.requests.endpoint.heartbeat(endpoint)
+        let result = await nem.com.requests.endpoint.heartbeat(this.endpoint)
         if (result.message === 'ok') {
             return true
         } else {
@@ -24,6 +25,7 @@ export default class nemWrapper {
         }
     }
 
+    // アカウント作成.
     async createAccount() {
         let walletName = "wallet"
         let password = "wallet"
@@ -38,12 +40,14 @@ export default class nemWrapper {
         return result
     }
 
+    // アカウント情報取得.
     async getAccount(address: string) {
         let result = await nem.com.requests.account.data(this.endpoint, address)
         return result
     }
 
-    async sendNem(address:string, privateKey:string, amount:string, message:string) {
+    // 送金（NEM）
+    async sendNem(address:string, privateKey:string, amount:number, message:string) {
         let common = nem.model.objects.create('common')('', privateKey)
         let transferTransaction = nem.model.objects.create('transferTransaction')(address, amount, message)
         let transactionEntity = nem.model.transactions.prepare('transferTransaction')(common, transferTransaction, this.net)
@@ -51,6 +55,7 @@ export default class nemWrapper {
         return result
     }
 
+    // 送金（Mosaic）
     async sendMosaics(address:string, privateKey:string, mosaics:Array<any>, message:string) {
         let common = nem.model.objects.create('common')('', privateKey)
         let transferTransaction = nem.model.objects.create('transferTransaction')(address, 1, message)
@@ -73,10 +78,12 @@ export default class nemWrapper {
         return result
     }
 
-    async getMosaics(publicKey: string) {
-
+    // モザイク取得
+    async getMosaics(address: string) {
+        // 工事中
     }
 
+    // モザイク定義取得.
     async getMosaicDefinitionMetaDataPair(endpoint:string, mosaics:Array<any>)
     {
         return new Promise(function(resolve, reject) {
@@ -117,6 +124,7 @@ export default class nemWrapper {
         })
     }
 
+    // QRコードjson取得.
     getQRcodeJson(v:string, type:number, name:string, addr:string, amount:number, msg:string) {
         // v:2, type:1 アカウント, type:2 請求書
         let amountVal = amount * Math.pow(10, 6)
@@ -133,6 +141,11 @@ export default class nemWrapper {
         let jsonString = JSON.stringify(json)
         let result = encoding.codeToString(encoding.convert(this.getStr2Array(jsonString), 'UTF8'))
         return result
+    }
+
+    // NEMの可分性取得
+    getNemDivisibility(): number {
+        return Math.pow(10, 6)
     }
 
     private getStr2Array(str:string) {

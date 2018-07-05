@@ -3,7 +3,6 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
-import 'vuetify/dist/vuetify.css'
 // 追加
 import Vuetify from 'vuetify'
 import colors from 'vuetify/es5/util/colors'
@@ -25,13 +24,16 @@ Vue.use(Vuetify, {
     themeVariations: ['original', 'secondary']
   }
 })
+
 Vue.use(Toast, {
   defaultType: 'bottom',
   duration: 3000,
   wordWrap: true,
   width: '280px'
 })
+
 Vue.use(VueQriously)
+
 Vue.use(VueQrcodeReader)
 
 Vue.config.productionTip = false

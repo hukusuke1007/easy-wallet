@@ -4,7 +4,11 @@
     <v-card>
       <v-container fluid>
         <v-card flat>
-          <v-card-title><b>残高</b></v-card-title>
+          <v-card-actions>
+            <v-card-title><b>残高</b></v-card-title>
+            <v-spacer />
+            <v-btn fab small flat @click="getAccount()" :loading="isLoading"><v-icon>cached</v-icon></v-btn>
+          </v-card-actions>
           <v-card-text>{{ wallet.balance }} xem</v-card-text>
           <v-card-title><b>送金先アドレス</b></v-card-title>
           <v-card-text>{{ wallet.address }}</v-card-text>
@@ -23,7 +27,6 @@
               placeholder="例. NBHWRG6STRXL2FGLEEB2UOUCBAQ27OSGDTO44UFC"
             ></v-text-field>
             <v-text-field
-              box
               label="NEM"
               v-model="toAmount"
               type="number"
@@ -56,13 +59,6 @@ import walletModel from '../ts/walletModel'
   data: () => ({
     nem: new nemWrapper(),
     qrJson: '',
-    /*
-    qrSize: 200,
-    toAmount: 0,
-    toAddr: '',
-    message: '',
-    valid: false,
-    */
     rules: {
       senderAddrLimit: (value:string) => (value && (value.length === 46 || value.length === 40)) || '送金先アドレス(-除く)は40文字です。',
       senderAddrInput: (value:string) => {
@@ -85,6 +81,7 @@ import walletModel from '../ts/walletModel'
 })
 
 export default class Wallet extends Vue {
+  isLoading:boolean = false
   wallet:walletModel = new walletModel()
   qrSize:number = 200
   toAmount:number = 0
@@ -92,12 +89,22 @@ export default class Wallet extends Vue {
   message:string = ''
   validation:Array<any> = []
   mounted () {
-    console.log('mounted Wallet')
   }
-  tapSend() {
+  async getAccount () {
+    this.isLoading = true
+    await this.wallet.getAccount()
+    this.isLoading = false
+  }
+  async tapSend() {
     console.log('tapSend')
     if (this.isValidation() === true) {
-      Vue.prototype.$toast('送金しました。')
+      let result = await this.wallet.sendNem(this.toAddr, this.toAmount, this.message)
+      console.log('tapSend', result)
+      let message = '送金しました'
+      if (result.message !== 'SUCCESS') {
+        message = "Error " + result.message
+      }
+      Vue.prototype.$toast(message)
     }
   }
   isValidation(): Boolean {
