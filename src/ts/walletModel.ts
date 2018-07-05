@@ -8,7 +8,7 @@ export default class walletModel {
     privateKey: string = ''
 
     nem = new nemWrapper()
-    
+
     constructor() {
         this.load()
         .then((result) => {
@@ -22,8 +22,9 @@ export default class walletModel {
                 }).catch((error) => {
                     console.error(error)
                 })
+            } else {
+                this.getAccount()
             }
-            this.getAccount()
         }).catch((error) => {
             console.error(error)
         })
@@ -31,14 +32,14 @@ export default class walletModel {
 
     // ローカルストレージへ保存.
     async save() {
-        let key = 'wallet'
+        let key = 'easy-wallet'
         let result:any = await localForage.setItem(key, this.toJSON())
         return result
     }
 
     // ローカルストレージから取得.
     async load() {
-        let key = 'wallet'
+        let key = 'easy-wallet'
         let result:any = await localForage.getItem(key)
         if (result !== null) {
             this.address = result.address
@@ -50,7 +51,7 @@ export default class walletModel {
 
     // ローカルストレージから削除.
     async remove() {
-        let key = 'wallet'
+        let key = 'easy-wallet'
         let result:any = await localForage.removeItem(key)
         return result
     }
