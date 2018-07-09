@@ -15,8 +15,8 @@
           <v-card flat><qriously v-model="qrJson" :size="qrSize" ></qriously></v-card>
         </v-card>
         <v-card flat>
-          <div v-for="(error, index) in validation" :key="index" class="errorLabel">
-            <div v-if="error!==true">{{ error }}</div>
+          <div v-for="(item, index) in validation" :key="index" class="errorLabel">
+            <div v-if="item!==true">{{ item }}</div>
           </div>
           <v-card-title><b>送金</b></v-card-title>
             <v-text-field
