@@ -10,9 +10,11 @@ export default class walletModel {
     nem = new nemWrapper()
 
     constructor() {
+        // クラス生成時にローカルストレージからアカウント情報を取得
         this.load()
         .then((result) => {
             console.log(result)
+            // 無ければアカウントを作成します
             if (result === null) {
                 this.nem.createAccount()
                 .then((wallet) => {
@@ -23,6 +25,7 @@ export default class walletModel {
                     console.error(error)
                 })
             } else {
+            // あればNEMの残高を取得します
                 this.getAccount()
             }
         }).catch((error) => {

@@ -3,6 +3,7 @@ declare module "*.vue" {
   export default Vue
 }
 
+// 追加
 declare module "nem-sdk"
 declare module "encoding-japanese"
 declare module "vuetify"

@@ -18,7 +18,7 @@ import Wallet from './components/Wallet.vue'
 // コンポーネントの設定
 @Component({
   name: 'app',
-  // Helloをcomponentとして定義する.
+  // Walletをcomponentとして定義する.
   components: {
     Wallet
   }
@@ -26,22 +26,8 @@ import Wallet from './components/Wallet.vue'
 
 // クラス
 export default class App extends Vue {
-  
-  // 変数( privateは書かなくても良い )
   private title = 'My NEM wallet'
-  private message = ''
-
-  // コンストラクタのようなもの。開くと初めに呼ばれる
-  mounted () {
-    // ログ出力 Chromeブラウザのconsoleで確認できる
-    console.log('mounted App')
-    // 関数呼び出し
-    this.showMsg('Hello, Vue.js and TypeScript')
-  }
-  // 関数
-  showMsg (msg: string) {
-    this.message = msg
-  } 
+  mounted () {}
 }
 </script>
 

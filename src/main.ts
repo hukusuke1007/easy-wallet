@@ -24,16 +24,13 @@ Vue.use(Vuetify, {
     themeVariations: ['original', 'secondary']
   }
 })
-
 Vue.use(Toast, {
   defaultType: 'bottom',
   duration: 3000,
   wordWrap: true,
   width: '280px'
 })
-
 Vue.use(VueQriously)
-
 Vue.use(VueQrcodeReader)
 
 Vue.config.productionTip = false
