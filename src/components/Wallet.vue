@@ -35,7 +35,6 @@
           <v-text-field
             label="メッセージ"
             v-model="message"
-            :counter="1024"
             placeholder="例. ありがとう"
           ></v-text-field>
           <v-flex>
@@ -62,7 +61,7 @@ import walletModel from '../ts/walletModel'
     rules: {
       senderAddrLimit: (value:string) => (value && (value.length === 46 || value.length === 40)) || '送金先アドレス(-除く)は40文字です。',
       senderAddrInput: (value:string) => {
-        const pattern = /^[a-zA-Z0-9-]+$/
+        const pattern = /^[nNtTmM][a-zA-Z0-9-]+$/
         return pattern.test(value) || '送金先の入力が不正です'
       },
       amountLimit: (value:number) => (value >= 0) || '数量を入力してください',
@@ -70,7 +69,9 @@ import walletModel from '../ts/walletModel'
         const pattern = /^[0-9.]+$/
         return (pattern.test(value) && !isNaN(Number(value))) || '数量の入力が不正です'
       },
-      messageRules: (value:string) => (value.length <= 1024) || 'メッセージの最大文字数が超えています。'
+      messageRules: (value:string) => {
+        const length = encodeURIComponent(value).replace(/%../g,"x").length
+        return length <= 1024 || 'メッセージの最大文字数が超えています。'}
     }
   }),
   watch: {
