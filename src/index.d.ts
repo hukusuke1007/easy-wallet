@@ -5,6 +5,7 @@ declare module "*.vue" {
 
 // 追加
 declare module "nem-sdk"
+// declare module "nem-library"
 declare module "encoding-japanese"
 declare module "vuetify"
 declare module "vuetify/es5/util/colors"

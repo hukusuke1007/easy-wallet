@@ -5,6 +5,7 @@
     </header>
     <main>
       <Wallet/>
+      <!-- <router-view></router-view> -->
     </main>
   </v-app>
 </template>

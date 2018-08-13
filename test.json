@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "cosignatories": [
+      {
+        "address": "NAWCHAAW6B272STZXYQTEHGQHD32GPJWQROWYZUQ",
+        "harvestedBlocks": 0,
+        "balance": 100000,
+        "importance": 0.0,
+        "vestedBalance": 0,
+        "publicKey": "fc9e7c5b11836792c76d16481822bd83ce3759cc2f8c4ff4b3dc5fb53a3828e5",
+        "label": null,
+        "multisigInfo": {}
+      }
+    ],
+    "cosignatoryOf": [],
+    "status": "LOCKED",
+    "remoteStatus": "INACTIVE"
+  },
+  "account": {
+    "address": "NDHJDMIUL3TLSZFWXTLG5K2ZPGEBPY4JXBPBLSJ2",
+    "harvestedBlocks": 0,
+    "balance": 500000,
+    "importance": 0.0,
+    "vestedBalance": 0,
+    "publicKey": "f6933823093a87fd743d78f327c09f8eb2a515f5064611d6f518abe95baebf03",
+    "label": null,
+    "multisigInfo": { "cosignatoriesCount": 1, "minCosignatories": 1 }
+  }
+}

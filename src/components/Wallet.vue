@@ -42,6 +42,17 @@
             <v-btn color="blue" class="white--text" @click="tapSend()">送金</v-btn>
           </v-flex>
         </v-card>
+        <v-card>
+          <v-card-actions>
+            <v-card-title><b>マルチシグ機能</b></v-card-title>
+          </v-card-actions>
+          <div><v-btn color="blue" class="white--text" @click="tapMultisigAccount">マルチシグアカウント作成</v-btn></div>
+          <div><v-btn color="blue" class="white--text" @click="tapModifuMultisigAccount">署名者追加</v-btn></div>
+          <div><v-btn color="blue" class="white--text" @click="tapSendMultisigAccount">NEMを送金</v-btn></div>
+          <div><v-btn color="blue" class="white--text" @click="tapGetTransaction">マルチシグ履歴確認</v-btn></div>
+          <div><v-btn color="blue" class="white--text" @click="tapGetUnconfirmedTx">未承認履歴確認</v-btn></div>
+          <div><v-btn color="blue" class="white--text" @click="tapSignMultisig">署名者2の署名</v-btn></div>
+        </v-card>
       </v-container>
     </v-card>
     </v-flex>
@@ -88,6 +99,9 @@ export default class Wallet extends Vue {
   toAddr:string = ''
   message:string = ''
   validation:Array<any> = []
+
+  nem = new nemWrapper()
+
   mounted () {
   }
   async getAccount () {
@@ -106,6 +120,24 @@ export default class Wallet extends Vue {
       }
       Vue.prototype.$toast(message)
     }
+  }
+  tapMultisigAccount() {
+    this.nem.testMultisig()
+  }
+  tapSendMultisigAccount() {
+    this.nem.testSendMultisig()
+  }
+  tapGetTransaction() {
+    this.nem.testGetTransaction()
+  }
+  tapGetUnconfirmedTx() {
+    this.nem.testGetUncofirmedTx()
+  }
+  tapModifuMultisigAccount() {
+    this.nem.testModifyMultisig()
+  }
+  tapSignMultisig() {
+    this.nem.testSignMultisig()
   }
   isValidation(): Boolean {
     this.validation = []

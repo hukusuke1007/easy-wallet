@@ -10,9 +10,13 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "@types/dotenv": "^4.0.3",
     "ajv": "^6.5.0",
+    "dotenv": "^6.0.0",
     "encoding-japanese": "^1.0.29",
+    "fs": "^0.0.1-security",
     "localforage": "^1.7.2",
+    "nem-library": "^1.0.9",
     "nem-sdk": "^1.6.7",
     "vue": "^2.5.2",
     "vue-qrcode-reader": "^0.8.3",
