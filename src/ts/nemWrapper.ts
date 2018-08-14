@@ -26,6 +26,9 @@ const nodes: Array<ServerConfig> = [
   {protocol: 'https', domain: 'pegatennnag.supernode.me', port: 7891}
 ]
 
+const accountHttp: AccountHttp = new AccountHttp(nodes)
+const transactionHttp: TransactionHttp = new TransactionHttp(nodes)
+const mosaicHttp = new MosaicHttp(nodes)
 
 export default class nemWrapper {
     endpoint: string = ''
@@ -33,8 +36,7 @@ export default class nemWrapper {
     port: string = ''
     net: string = ''
 
-    accountHttp: AccountHttp = new AccountHttp(nodes)
-    transactionHttp: TransactionHttp = new TransactionHttp(nodes)
+
 
     constructor () {
         // NIS設定.
@@ -194,15 +196,39 @@ export default class nemWrapper {
     }
 
     testSendMultisig() {
-      let consigPrivateKey = CONSIG_1_PRIVATE_KEY           // 署名者1
-      let multisigPublicKey = MULTISIG_ACCOUNT_PUBIC_KEY    // マルチシグアカウント
-      let toAddr: string = SENDER_ADDRESS                   // 送金先.
-      let amount: number = 1 / Math.pow(10, 6)
-      this.sendXemMultisig(consigPrivateKey, multisigPublicKey, toAddr, amount, "")
+      let consigPrivateKey: string = CONSIG_1_PRIVATE_KEY           // 署名者1
+      let multisigPublicKey: string = MULTISIG_ACCOUNT_PUBIC_KEY    // マルチシグアカウント
+
+      let toAddr: string = SENDER_ADDRESS
+      let amount: number = 0.001
+      let message: string = ""
+      this.createXemTransaction(consigPrivateKey, toAddr, amount, message, multisigPublicKey)
         .then(result => {
           console.log("testSendMultisig", result)
         }).catch(error => {
           console.error("testSendMultisig", error)
+        })
+    }
+
+    testSendMosaicMultisig() {
+      let consigPrivateKey: string = CONSIG_1_PRIVATE_KEY         // 署名者1
+      let multisigPublicKey: string = MULTISIG_ACCOUNT_PUBIC_KEY  // マルチシグアカウント
+
+      let toAddr: string = SENDER_ADDRESS
+      let mosaics: Array<any> = [
+        {
+          namespaceId: 'nem',
+          name: 'xem',
+          quantity: 0.001
+        }
+      ]
+      let message: string = ""
+      //this.createMosaicsTransaction(consigPrivateKey, toAddr, mosaics, message, undefined)      // マルチシグじゃないアカウント　送金
+      this.createMosaicsTransaction(consigPrivateKey, toAddr, mosaics, message, multisigPublicKey)  // マルチシグアカウント 送金
+        .then(result => {
+          console.log("testSendMosaicMultisig", result)
+        }).catch(error => {
+          console.error("testSendMosaicMultisig", error)
         })
     }
 
@@ -254,7 +280,7 @@ export default class nemWrapper {
         const account = Account.createWithPrivateKey(targetPrivateKey)
         const convertIntoMultisigTransaction = this.getMultisigModifications(signPublicKeys)
         const signedTransaction = account.signTransaction(convertIntoMultisigTransaction)
-        this.transactionHttp.announceTransaction(signedTransaction).subscribe(
+        transactionHttp.announceTransaction(signedTransaction).subscribe(
           result => {
             console.log(result)
             resolve(result)
@@ -278,7 +304,7 @@ export default class nemWrapper {
         )
         const account = Account.createWithPrivateKey(consigPrivateKey)
         const signedTransaction = account.signTransaction(multisigTransaction);
-        this.transactionHttp.announceTransaction(signedTransaction).subscribe(
+        transactionHttp.announceTransaction(signedTransaction).subscribe(
           result => {
             console.log(result)
             resolve(result)
@@ -291,7 +317,7 @@ export default class nemWrapper {
       })
     }
 
-    // マルチシグトランザクション作成
+    // XEMのマルチシグトランザクション作成
     createMultisigTransaction(multisigPublicKey: string, addr: string, amount: number, message: string) {
       const transferTransaction: Transaction = TransferTransaction.create(
           TimeWindow.createWithDeadline(),
@@ -308,12 +334,24 @@ export default class nemWrapper {
     }
 
     // マルチシグアカウントからNEMを送金
-    sendXemMultisig(consigPrivateKey: string, multisigPublicKey: string, addr: string, amount: number, message: string) {
+    createXemTransaction(consigPrivateKey: string, addr: string, amount: number, message: string, multisigPublicKey?: string) {
       return new Promise((resolve, reject) => {
-        let multisigTransaction = this.createMultisigTransaction(multisigPublicKey, addr, amount, message)
         let account = Account.createWithPrivateKey(consigPrivateKey)
-        let signedTransaction = account.signTransaction(multisigTransaction)
-        this.transactionHttp.announceTransaction(signedTransaction).subscribe(
+        let signedTransaction: SignedTransaction
+        if (multisigPublicKey) {
+          const multisigTransaction = this.createMultisigTransaction(multisigPublicKey, addr, amount, message)
+          signedTransaction = account.signTransaction(multisigTransaction)
+        } else {
+          const transferTransaction: Transaction = TransferTransaction.create(
+            TimeWindow.createWithDeadline(),
+            new Address(addr),
+            new XEM(amount),
+            PlainMessage.create(message)
+          )
+          signedTransaction = account.signTransaction(transferTransaction)
+        }
+
+        transactionHttp.announceTransaction(signedTransaction).subscribe(
           result => {
             console.log(result)
             return resolve(result)
@@ -326,9 +364,95 @@ export default class nemWrapper {
       })
     }
 
-    getUnconfirmedTransactions(addr: string) {
+    // モザイク送金
+    createMosaicsTransaction(consigPrivateKey: string, addr:string, mosaicDatas: Array<any>, message: string, multisigPublicKey?: string)  {
+      return new Promise((resolve, reject) => {
+        let account = Account.createWithPrivateKey(consigPrivateKey)
+        let address = new Address(addr)
+        let dataList: Array<any> = []
+        let isXEM = false
+        let xemQuantity: number = 0
+        mosaicDatas.forEach((element) => {
+          let data: any = {}
+          if ((element.namespaceId === 'nem') && (element.name === 'xem')) {
+            isXEM = true
+            xemQuantity = element.quantity
+          } else {
+            data.mosaic = new MosaicId(element.namespaceId, element.name)
+            data.quantity = element.quantity
+            dataList.push(data)
+          }
+        })
 
-      this.accountHttp.unconfirmedTransactions(new Address(addr))
+        // 送金
+        if ((dataList.length === 0) && (isXEM)) {
+          // XEMのみの場合.
+          let mosaics = []
+          mosaics.push(new XEM(xemQuantity))
+          let transaction = TransferTransaction.createWithMosaics(
+            TimeWindow.createWithDeadline(),
+            address,
+            mosaics,
+            PlainMessage.create(message)
+          )
+
+          let signedTransaction: SignedTransaction
+          if (multisigPublicKey) {
+            let multisigTransaction = MultisigTransaction.create(
+              TimeWindow.createWithDeadline(),
+              transaction,
+              PublicAccount.createWithPublicKey(multisigPublicKey)
+            )
+            signedTransaction = account.signTransaction(multisigTransaction)
+          } else {
+            signedTransaction = account.signTransaction(transaction)
+          }
+
+          transactionHttp.announceTransaction(signedTransaction).subscribe(
+            result => { resolve(result) },
+            error => { reject(error) }
+          )
+        } else {
+          Observable.from(dataList)
+            .flatMap(mosaicWithAmount => mosaicHttp.getMosaicTransferableWithAmount(
+              mosaicWithAmount.mosaic,
+              mosaicWithAmount.quantity
+            ))
+            .toArray()
+            .map(mosaics => {
+              if (isXEM) { mosaics.unshift(new XEM(xemQuantity)) }
+              return mosaics
+            })
+            .map(mosaics => TransferTransaction.createWithMosaics(
+              TimeWindow.createWithDeadline(),
+              address,
+              mosaics,
+              PlainMessage.create(message)
+            ))
+            .map(transaction => {
+              if (multisigPublicKey) {
+                return MultisigTransaction.create(
+                    TimeWindow.createWithDeadline(),
+                    transaction,
+                    PublicAccount.createWithPublicKey(multisigPublicKey)
+                  )
+              } else {
+                return transaction
+              }
+            })
+            .map(transaction => account.signTransaction(transaction))
+            .flatMap(signedTransaction => transactionHttp.announceTransaction(signedTransaction))
+            .subscribe(
+              result => { resolve(result) },
+              error => { reject(error) }
+            )
+        }
+      })
+    }
+
+    // 未承認トランザクション取得
+    getUnconfirmedTransactions(addr: string) {
+      accountHttp.unconfirmedTransactions(new Address(addr))
         .subscribe(result => {
             console.log("success")
             console.log(result)
@@ -345,7 +469,7 @@ export default class nemWrapper {
       const signer = Account.createWithPrivateKey(signerKey)
       // const signerPubKey:string = CONSIG_2_PUBIC_KEY
 
-      this.accountHttp.unconfirmedTransactions(new Address(multisigAddr))
+      accountHttp.unconfirmedTransactions(new Address(multisigAddr))
         .flatMap(x => x)
         .filter(transaction => transaction.type == TransactionTypes.MULTISIG)
         /*
@@ -368,7 +492,7 @@ export default class nemWrapper {
         })
         .map((transaction: MultisigSignatureTransaction) => signer.signTransaction(transaction))
         .flatMap((signedTransaction: SignedTransaction) =>
-          this.transactionHttp.announceTransaction(signedTransaction)
+          transactionHttp.announceTransaction(signedTransaction)
         )
         .subscribe(result => {
             console.log("success")
@@ -382,7 +506,7 @@ export default class nemWrapper {
     // マルチシグのトランザクション履歴取得
     getTransaction(addr: string) {
       return new Promise((resolve, reject) => {
-        this.accountHttp.allTransactions(new Address(addr))
+        accountHttp.allTransactions(new Address(addr))
         .map((transactions: Transaction[]): MultisigTransaction[] => {
             console.log(">>>>>>>>>>>>")
             console.log(addr, "All Transactions", transactions)

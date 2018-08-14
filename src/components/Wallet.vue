@@ -49,6 +49,7 @@
           <div><v-btn color="blue" class="white--text" @click="tapMultisigAccount">マルチシグアカウント作成</v-btn></div>
           <div><v-btn color="blue" class="white--text" @click="tapModifuMultisigAccount">署名者追加</v-btn></div>
           <div><v-btn color="blue" class="white--text" @click="tapSendMultisigAccount">NEMを送金</v-btn></div>
+          <div><v-btn color="blue" class="white--text" @click="tapSendMosaicMultisigAccount">モザイクを送金</v-btn></div>
           <div><v-btn color="blue" class="white--text" @click="tapGetTransaction">マルチシグ履歴確認</v-btn></div>
           <div><v-btn color="blue" class="white--text" @click="tapGetUnconfirmedTx">未承認履歴確認</v-btn></div>
           <div><v-btn color="blue" class="white--text" @click="tapSignMultisig">署名者2の署名</v-btn></div>
@@ -126,6 +127,9 @@ export default class Wallet extends Vue {
   }
   tapSendMultisigAccount() {
     this.nem.testSendMultisig()
+  }
+  tapSendMosaicMultisigAccount() {
+    this.nem.testSendMosaicMultisig()
   }
   tapGetTransaction() {
     this.nem.testGetTransaction()
