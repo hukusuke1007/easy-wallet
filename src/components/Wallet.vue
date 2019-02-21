@@ -89,6 +89,9 @@ import walletModel from '../ts/walletModel'
     'wallet.address' (newVal, oldVal) {
       this.$data.qrJson = this.$data.nem.getQRcodeJson('2', 2, '', newVal, 0, '')
     }
+  },
+  methods: {
+
   }
 })
 
